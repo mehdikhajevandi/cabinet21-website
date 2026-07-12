@@ -1,76 +1,68 @@
 import { motion } from "framer-motion";
-
-const stats = [
-  { value: "12+", label: "Years of Experience" },
-  { value: "180+", label: "Kitchens Designed" },
-  { value: "40+", label: "Luxury Residences" },
-  { value: "100%", label: "Bespoke 3D Visualized" },
-];
+import { useLanguage } from "../i18n/LanguageContext";
 
 export default function About() {
+  const { t } = useLanguage();
+
   return (
-    <section id="about" className="relative overflow-hidden bg-charcoal py-28 md:py-36">
-      <div className="pointer-events-none absolute -left-24 top-0 h-96 w-96 rounded-full bg-[#6b4327]/20 blur-[120px]" />
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 md:grid-cols-2 md:px-10">
+    <section id="about" className="relative overflow-hidden bg-noir py-24 sm:py-32">
+      <div className="pointer-events-none absolute -top-40 start-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-[#b8935a]/10 blur-[120px]" />
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 lg:grid-cols-2 lg:px-10">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          className="relative"
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="relative order-2 lg:order-1"
         >
-          <div className="group relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border border-white/10">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
             <img
-              src="/images/about-mehdi.jpg"
-              alt="Design studio workspace of Mehdi Khajevandi, featuring wood material samples and 3D kitchen renderings"
+              src="/images/about-kitchen.jpg"
+              alt="Cabinet21 walnut cabinetry detail"
+              className="h-full w-full object-cover transition-transform duration-[1.2s] hover:scale-105"
               loading="lazy"
-              className="h-full w-full scale-105 object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-100"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </div>
-          <div className="glass-strong absolute -bottom-8 -right-4 max-w-[240px] rounded-2xl p-5 shadow-2xl shadow-black/40 sm:-right-10">
-            <p className="font-display text-3xl text-[#e0c393]">15+</p>
-            <p className="mt-1 text-xs uppercase tracking-widest text-white/60">
-              Years crafting timeless interiors
-            </p>
+          <div className="glass-panel absolute -bottom-8 -end-6 max-w-[240px] rounded-2xl p-5 shadow-2xl">
+            <p className="serif-heading text-3xl font-semibold text-gradient-gold">9+</p>
+            <p className="mt-1 text-xs leading-relaxed text-beige/70">{t.about.designer}</p>
+            <p className="text-sm font-medium text-beige-light">{t.about.designerName}</p>
           </div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="order-1 lg:order-2"
         >
-          <span className="section-eyebrow text-xs font-medium uppercase text-[#cba463]">
-            About the Designer
-          </span>
-          <h2 className="mt-4 font-display text-4xl leading-tight text-bone sm:text-5xl">
-            Meet <span className="text-gradient-gold">Mehdi Khajevandi</span>
+          <div className="mb-5 flex items-center gap-3">
+            <span className="h-px w-10 bg-[#b8935a]" />
+            <span className="text-xs font-medium tracking-[0.25em] text-[#e0bd85] uppercase">
+              {t.about.eyebrow}
+            </span>
+          </div>
+          <h2 className="serif-heading mb-6 text-4xl font-semibold text-beige-light sm:text-5xl">
+            {t.about.title}
           </h2>
-          <p className="mt-6 text-lg font-light leading-relaxed text-white/70">
-            Mehdi Khajevandi is a professional kitchen and cabinet designer focused on creating
-            functional, elegant, and realistic interior spaces using advanced 3D visualization.
-          </p>
-          <p className="mt-4 text-base font-light leading-relaxed text-white/50">
-            With a rare balance of architectural precision and artistic intuition, Mehdi partners
-            with homeowners, architects, and builders to translate ambitious visions into
-            timeless, livable spaces — every cabinet line, material pairing, and light source
-            considered down to the millimeter.
-          </p>
+          <p className="mb-10 max-w-xl text-lg leading-loose text-beige/75">{t.about.text}</p>
 
-          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {stats.map((s, i) => (
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+            {t.about.stats.map((stat, i) => (
               <motion.div
-                key={s.label}
+                key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-                className="border-l border-white/10 pl-4"
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="border-s border-white/10 ps-4"
               >
-                <p className="font-display text-2xl text-[#e0c393] sm:text-3xl">{s.value}</p>
-                <p className="mt-1 text-xs uppercase tracking-wide text-white/50">{s.label}</p>
+                <p className="serif-heading text-2xl font-semibold text-gradient-gold sm:text-3xl">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-beige/60">{stat.label}</p>
               </motion.div>
             ))}
           </div>

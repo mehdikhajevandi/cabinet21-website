@@ -1,0 +1,138 @@
+{
+  "fa": {
+    "items": [
+      {
+        "category": "Modern Kitchen",
+        "categoryFa": "آشپزخانه مدرن",
+        "title": "پروژه مدرن ولنجک",
+        "description": "این پروژه با رویکرد مینیمال و کارکردی طراحی شده است و ترکیبی از متریال طبیعی، نورپردازی مخفی و جزئیات ظریف را در یک فضای آرام و لوکس ارائه می‌دهد.",
+        "material": "والنوت طبیعی و کوارتز",
+        "location": "ولنجک، تهران",
+        "year": "۱۴۰۳",
+        "scope": "طراحی و اجرای کامل",
+        "image": "/images/portfolio-modern.jpg",
+        "highlights": [
+          "کابینت سفارشی با نظم بصری بالا",
+          "رنگ‌بندی خنثی و روشن",
+          "فضای ذخیره‌سازی هوشمند"
+        ]
+      },
+      {
+        "category": "Luxury Kitchen",
+        "categoryFa": "آشپزخانه لوکس",
+        "title": "پروژه لوکس زعفرانیه",
+        "description": "این پروژه بر پایه‌ی هویت لوکس و آرامش فضایی طراحی شده و با استفاده از متریال شاخص، جزئیات برنجی و نورپردازی متمرکز، حس اصالت و شکوه را منتقل می‌کند.",
+        "material": "مرمر و برنج",
+        "location": "زعفرانیه، تهران",
+        "year": "۱۴۰۲",
+        "scope": "طراحی و مشاوره اجرایی",
+        "image": "/images/portfolio-luxury.jpg",
+        "highlights": [
+          "تک‌تک جزئیات با دقت اجرا شده‌اند",
+          "ترکیب برنج و مرمر با ظاهری فاخر",
+          "فضای کاربردی با حس مدرن"
+        ]
+      },
+      {
+        "category": "Minimal Kitchen",
+        "categoryFa": "آشپزخانه مینیمال",
+        "title": "پروژه مینیمال الهیه",
+        "description": "این طراحی با تاکید بر سادگی، خطوط تمیز و استفاده بهینه از فضا، محیطی آرام و مدرن برای زندگی روزمره فراهم می‌کند.",
+        "material": "چوب روشن و لاکوبل",
+        "location": "الهیه، تهران",
+        "year": "۱۴۰۱",
+        "scope": "طراحی داخلی و کابینت‌سازی",
+        "image": "/images/portfolio-minimal.jpg",
+        "highlights": [
+          "رویکرد مینیمال با کارایی بالا",
+          "تنظیم روشنایی و فضا برای حس آرامش",
+          "جزئیات ظریف در هر سطح"
+        ]
+      },
+      {
+        "category": "Neoclassical Kitchen",
+        "categoryFa": "آشپزخانه نئوکلاسیک",
+        "title": "پروژه نئوکلاسیک نیاوران",
+        "description": "این پروژه هویت کلاسیک را با فرم‌های امروزی ترکیب کرده و با استفاده از متریال گرم و جزئیات خاص، حس اصالت را در فضا زنده می‌کند.",
+        "material": "چوب کلاسیک و طلایی",
+        "location": "نیاوران، تهران",
+        "year": "۱۴۰۴",
+        "scope": "طراحی اختصاصی و اجرای جزئیات",
+        "image": "/images/portfolio-neoclassical.jpg",
+        "highlights": [
+          "ترکیب فرم کلاسیک و عملکرد مدرن",
+          "استفاده از جزئیات طلایی و چوب گرم",
+          "حس لوکس و ماندگار"
+        ]
+      }
+    ]
+  },
+  "en": {
+    "items": [
+      {
+        "category": "Modern Kitchen",
+        "categoryFa": "آشپزخانه مدرن",
+        "title": "Velenjak Modern Residence",
+        "description": "This project was designed with a minimal and functional approach, blending natural materials, concealed lighting, and refined details into a calm and luxurious atmosphere.",
+        "material": "Natural Walnut & Quartz",
+        "location": "Velenjak, Tehran",
+        "year": "2024",
+        "scope": "Full design and execution",
+        "image": "/images/portfolio-modern.jpg",
+        "highlights": [
+          "Custom cabinetry with strong visual order",
+          "Neutral and bright color palette",
+          "Intelligent storage solutions"
+        ]
+      },
+      {
+        "category": "Luxury Kitchen",
+        "categoryFa": "آشپزخانه لوکس",
+        "title": "Zafaraniyeh Luxury Villa",
+        "description": "Built around a luxurious identity and spatial serenity, this project uses iconic materials, brass detailing, and focused lighting to convey elegance and prestige.",
+        "material": "Marble & Brass",
+        "location": "Zafaraniyeh, Tehran",
+        "year": "2023",
+        "scope": "Design and execution consultancy",
+        "image": "/images/portfolio-luxury.jpg",
+        "highlights": [
+          "Every detail crafted with precision",
+          "Elegant brass and marble combination",
+          "Functional space with a modern feel"
+        ]
+      },
+      {
+        "category": "Minimal Kitchen",
+        "categoryFa": "آشپزخانه مینیمال",
+        "title": "Elahiyeh Minimal Loft",
+        "description": "This design emphasizes simplicity, clean lines, and efficient use of space to create a calm, modern environment for everyday living.",
+        "material": "Light Oak & Lacobel",
+        "location": "Elahiyeh, Tehran",
+        "year": "2022",
+        "scope": "Interior design and cabinetry",
+        "image": "/images/portfolio-minimal.jpg",
+        "highlights": [
+          "Minimal approach with high efficiency",
+          "Lighting and layout designed for calm",
+          "Fine detailing throughout"
+        ]
+      },
+      {
+        "category": "Neoclassical Kitchen",
+        "categoryFa": "آشپزخانه نئوکلاسیک",
+        "title": "Niavaran Neoclassical Estate",
+        "description": "This project merges classical identity with contemporary form, bringing warmth and timeless character through rich materials and detailed craftsmanship.",
+        "material": "Classic Wood & Gold",
+        "location": "Niavaran, Tehran",
+        "year": "2025",
+        "scope": "Custom design and detail execution",
+        "image": "/images/portfolio-neoclassical.jpg",
+        "highlights": [
+          "Blend of classical form and modern function",
+          "Use of gold details and warm wood",
+          "Luxurious and lasting atmosphere"
+        ]
+      }
+    ]
+  }
+}

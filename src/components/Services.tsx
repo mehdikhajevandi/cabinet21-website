@@ -1,79 +1,68 @@
 import { motion } from "framer-motion";
+import {
+  PiCookingPotDuotone,
+  PiCubeDuotone,
+  PiArmchairDuotone,
+  PiSquaresFourDuotone,
+  PiHammerDuotone,
+} from "react-icons/pi";
+import { useLanguage } from "../i18n/LanguageContext";
 
-const services = [
-  {
-    title: "Kitchen Design",
-    description:
-      "Full concept-to-completion kitchen design blending ergonomic layouts with sculptural, timeless forms.",
-    icon: "01",
-  },
-  {
-    title: "Cabinet Design",
-    description:
-      "Bespoke cabinetry crafted from premium oak, walnut and lacquered finishes, engineered to last generations.",
-    icon: "02",
-  },
-  {
-    title: "Interior Visualization",
-    description:
-      "Photorealistic interior visualization that lets you experience your space long before construction begins.",
-    icon: "03",
-  },
-  {
-    title: "3D Rendering",
-    description:
-      "Cinematic, render-quality imagery and walkthroughs used to refine every material and lighting decision.",
-    icon: "04",
-  },
-  {
-    title: "Custom Furniture Design",
-    description:
-      "One-of-a-kind furniture pieces designed to complement architectural details and elevate everyday living.",
-    icon: "05",
-  },
-];
+const icons = [PiCookingPotDuotone, PiSquaresFourDuotone, PiCubeDuotone, PiArmchairDuotone, PiHammerDuotone];
 
 export default function Services() {
-  return (
-    <section id="services" className="relative bg-ink py-28 md:py-36">
-      <div className="mx-auto max-w-7xl px-6 md:px-10">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="section-eyebrow text-xs font-medium uppercase text-[#cba463]">
-            What We Do
-          </span>
-          <h2 className="mt-4 font-display text-4xl text-bone sm:text-5xl">
-            Services crafted for <span className="text-gradient-gold">discerning spaces</span>
-          </h2>
-          <p className="mt-5 text-base font-light text-white/60">
-            Every project begins with listening — followed by precise design, engineering, and
-            visualization to make sure the final result feels inevitable.
-          </p>
-        </div>
+  const { t } = useLanguage();
 
-        <div className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, i) => (
-            <motion.div
-              key={service.title}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, delay: (i % 3) * 0.1 }}
-              whileHover={{ y: -8 }}
-              className={`group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.01] p-8 transition-colors duration-500 hover:border-[#cba463]/40 ${
-                i === 4 ? "md:col-span-2 lg:col-span-1" : ""
-              }`}
-            >
-              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#cba463]/0 blur-3xl transition-all duration-700 group-hover:bg-[#cba463]/15" />
-              <span className="font-display text-5xl text-white/10 transition-colors duration-500 group-hover:text-[#cba463]/40">
-                {service.icon}
-              </span>
-              <h3 className="mt-6 font-display text-2xl text-bone">{service.title}</h3>
-              <p className="mt-3 text-sm font-light leading-relaxed text-white/55">
-                {service.description}
-              </p>
-              <div className="mt-6 h-px w-10 bg-[#cba463]/50 transition-all duration-500 group-hover:w-20" />
-            </motion.div>
-          ))}
+  return (
+    <section id="services" className="relative bg-graphite py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.8 }}
+          className="mx-auto mb-16 max-w-2xl text-center"
+        >
+          <div className="mb-5 flex items-center justify-center gap-3">
+            <span className="h-px w-10 bg-[#b8935a]" />
+            <span className="text-xs font-medium tracking-[0.25em] text-[#e0bd85] uppercase">
+              {t.services.eyebrow}
+            </span>
+            <span className="h-px w-10 bg-[#b8935a]" />
+          </div>
+          <h2 className="serif-heading mb-5 text-4xl font-semibold text-beige-light sm:text-5xl">
+            {t.services.title}
+          </h2>
+          <p className="text-beige/70">{t.services.subtitle}</p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {t.services.items.map((item, i) => {
+            const Icon = icons[i];
+            return (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, delay: (i % 3) * 0.12 }}
+                whileHover={{ y: -8 }}
+                className={`group glass-panel relative overflow-hidden rounded-2xl p-8 transition-colors duration-500 hover:border-[#b8935a]/40 ${
+                  i === 4 ? "sm:col-span-2 lg:col-span-1" : ""
+                }`}
+              >
+                <div className="pointer-events-none absolute -end-10 -top-10 h-32 w-32 rounded-full bg-[#b8935a]/0 blur-2xl transition-colors duration-500 group-hover:bg-[#b8935a]/15" />
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl border border-[#b8935a]/30 bg-[#b8935a]/5 text-3xl text-[#e0bd85] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                  <Icon />
+                </div>
+                <h3 className="serif-heading mb-3 text-xl font-semibold text-beige-light">
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-beige/65">{item.desc}</p>
+                <div className="mt-6 h-px w-0 bg-gradient-to-r from-[#e0bd85] to-transparent transition-all duration-700 group-hover:w-full" />
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,116 +1,108 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "../i18n/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Contact", href: "#contact" },
-];
+const sections = ["home", "about", "services", "portfolio", "process", "contact"] as const;
 
 export default function Navbar() {
+  const { t, dir } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 40);
-    }
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  function handleNav(href: string) {
+  const scrollTo = (id: string) => {
     setOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-  }
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <header
+    <motion.header
+      initial={{ y: -40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
       className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-        scrolled ? "py-3" : "py-6"
+        scrolled ? "glass-panel border-b border-white/10 py-3" : "bg-transparent py-6"
       }`}
     >
-      <div
-        className={`mx-auto flex max-w-7xl items-center justify-between rounded-full px-6 transition-all duration-500 md:px-8 ${
-          scrolled ? "glass-strong mx-4 py-3 shadow-2xl shadow-black/40 md:mx-auto" : "py-2"
-        }`}
-      >
-        <a
-          href="#top"
-          onClick={(e) => {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          className="flex items-center gap-2"
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
+        <button
+          onClick={() => scrollTo("home")}
+          className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#cba463]/50 font-display text-lg text-[#e0c393]">
-            C21
+          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#b8935a]/50 text-sm font-semibold text-gradient-gold serif-heading">
+            21
           </span>
-          <span className="font-display text-xl tracking-wide text-bone">
-            Cabinet<span className="text-[#cba463]">21</span>
+          <span className="text-lg font-semibold tracking-[0.15em] text-beige-light en-only" style={{ fontFamily: "var(--font-serif-en)" }}>
+            CABINET21
           </span>
-        </a>
+          <span className="fa-only text-lg font-bold tracking-wide">کابینت ۲۱</span>
+        </button>
 
-        <nav className="hidden items-center gap-10 md:flex">
-          {LINKS.map((link) => (
+        <nav className="hidden items-center gap-8 lg:flex">
+          {sections.map((s) => (
             <button
-              key={link.href}
-              onClick={() => handleNav(link.href)}
-              className="group relative text-sm font-medium uppercase tracking-[0.15em] text-white/70 transition-colors hover:text-white"
+              key={s}
+              onClick={() => scrollTo(s)}
+              className="text-sm font-medium tracking-wide text-beige/80 transition-colors hover:text-[#e0bd85] cursor-pointer"
             >
-              {link.label}
-              <span className="absolute -bottom-1 left-0 h-px w-0 bg-[#cba463] transition-all duration-300 group-hover:w-full" />
+              {t.nav[s]}
             </button>
           ))}
         </nav>
 
-        <button
-          onClick={() => handleNav("#contact")}
-          className="btn-shine hidden rounded-full border border-[#cba463]/60 px-5 py-2 text-sm font-medium tracking-wide text-[#e0c393] transition-colors hover:bg-[#cba463]/10 md:block"
-        >
-          Book a Consultation
-        </button>
+        <div className="hidden items-center gap-4 lg:flex">
+          <LanguageSwitcher />
+          <button
+            onClick={() => scrollTo("contact")}
+            className="rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-5 py-2 text-sm font-semibold text-[#0a0908] shadow-lg shadow-black/30 transition-transform hover:scale-105 cursor-pointer"
+          >
+            {t.nav.cta}
+          </button>
+        </div>
 
-        <button
-          aria-label="Toggle menu"
-          className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden"
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span className={`h-px w-6 bg-white transition-transform ${open ? "translate-y-2 rotate-45" : ""}`} />
-          <span className={`h-px w-6 bg-white transition-opacity ${open ? "opacity-0" : ""}`} />
-          <span className={`h-px w-6 bg-white transition-transform ${open ? "-translate-y-2 -rotate-45" : ""}`} />
-        </button>
+        <div className="flex items-center gap-3 lg:hidden">
+          <LanguageSwitcher />
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full border border-white/15 cursor-pointer"
+            aria-label="menu"
+          >
+            <span className={`h-[1.5px] w-5 bg-beige-light transition-transform ${open ? "translate-y-[3px] rotate-45" : ""}`} />
+            <span className={`h-[1.5px] w-5 bg-beige-light transition-transform ${open ? "-translate-y-[3px] -rotate-45" : ""}`} />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="glass-strong mx-4 mt-2 overflow-hidden rounded-3xl md:hidden"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="overflow-hidden lg:hidden"
           >
-            <div className="flex flex-col gap-1 p-4">
-              {LINKS.map((link) => (
+            <div className="glass-panel mx-4 mt-4 flex flex-col gap-1 rounded-2xl p-4" dir={dir}>
+              {sections.map((s) => (
                 <button
-                  key={link.href}
-                  onClick={() => handleNav(link.href)}
-                  className="rounded-xl px-4 py-3 text-left text-sm uppercase tracking-widest text-white/80 hover:bg-white/5"
+                  key={s}
+                  onClick={() => scrollTo(s)}
+                  className="rounded-lg px-4 py-3 text-start text-sm font-medium text-beige/90 transition-colors hover:bg-white/5 cursor-pointer"
                 >
-                  {link.label}
+                  {t.nav[s]}
                 </button>
               ))}
-              <button
-                onClick={() => handleNav("#contact")}
-                className="mt-2 rounded-full border border-[#cba463]/60 px-4 py-3 text-sm text-[#e0c393]"
-              >
-                Book a Consultation
-              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </motion.header>
   );
 }

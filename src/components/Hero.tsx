@@ -1,140 +1,151 @@
-import { Suspense, useEffect, useRef } from "react";
-import { Canvas } from "@react-three/fiber";
-import { motion } from "framer-motion";
-import gsap from "gsap";
-import KitchenScene from "../three/KitchenScene";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useLanguage } from "../i18n/LanguageContext";
+import HeroScene from "./HeroScene";
 
 export default function Hero() {
-  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const { t, lang } = useLanguage();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
 
   useEffect(() => {
-    if (!headlineRef.current) return;
-    const words = headlineRef.current.querySelectorAll(".word");
-    gsap.fromTo(
-      words,
-      { y: 60, opacity: 0, filter: "blur(8px)" },
-      {
-        y: 0,
-        opacity: 1,
-        filter: "blur(0px)",
-        duration: 1.1,
-        stagger: 0.12,
-        ease: "power3.out",
-        delay: 0.3,
-      }
-    );
+    const onMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      setMouse({ x, y });
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
   return (
-    <section id="top" className="relative flex h-[100svh] w-full items-center justify-center overflow-hidden bg-ink">
-      {/* 3D Scene */}
-      <div className="absolute inset-0">
-        <Canvas
-          shadows
-          dpr={[1, 1.6]}
-          camera={{ position: [0, 1.4, 6.4], fov: 42 }}
-          gl={{ antialias: true, alpha: false }}
-        >
-          <color attach="background" args={["#08090a"]} />
-          <Suspense fallback={null}>
-            <KitchenScene />
-          </Suspense>
-        </Canvas>
+    <section
+      id="home"
+      ref={sectionRef}
+      className="relative flex h-[100svh] min-h-[640px] w-full items-center justify-center overflow-hidden bg-noir"
+    >
+      {/* Background image with parallax */}
+      <motion.div
+        style={{
+          y: bgY,
+          x: mouse.x * -12,
+          scale: 1.12,
+        }}
+        className="absolute inset-0 z-0"
+      >
+        <img
+          src="/images/hero-kitchen.jpg"
+          alt="Luxury modern kitchen by Cabinet21"
+          className="h-full w-full object-cover"
+          fetchPriority="high"
+        />
+      </motion.div>
+
+      {/* Cinematic overlays */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/70 via-black/50 to-noir" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/70 via-transparent to-black/60" />
+      <div className="absolute inset-0 z-[1] bg-noir/20" />
+
+      {/* 3D layer */}
+      <div
+        style={{ transform: `translate(${mouse.x * 8}px, ${mouse.y * 6}px)` }}
+        className="pointer-events-none absolute inset-0 z-[2] hidden opacity-70 transition-transform duration-300 ease-out md:block"
+      >
+        <HeroScene />
       </div>
 
-      {/* Gradient overlays for legibility */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-ink/10" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink/70 via-transparent to-ink/50" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-ink to-transparent" />
-
-      {/* Animated background gradient blobs */}
-      <motion.div
-        className="pointer-events-none absolute -left-40 top-1/3 h-[420px] w-[420px] rounded-full bg-[#cba463]/10 blur-[110px]"
-        animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="pointer-events-none absolute -right-32 bottom-0 h-[380px] w-[380px] rounded-full bg-[#6b4327]/20 blur-[110px]"
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.7, 0.4] }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       {/* Content */}
-      <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-6 text-center">
-        <motion.span
-          initial={{ opacity: 0, y: -10 }}
+      <motion.div
+        style={{ opacity, y: contentY }}
+        className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-6 text-center"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.8 }}
-          className="section-eyebrow mb-6 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-5 py-2 text-[11px] font-medium uppercase text-[#e0c393] backdrop-blur"
+          transition={{ duration: 0.9, delay: 0.2 }}
+          className="mb-6 flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-5 py-2 backdrop-blur-md"
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-[#cba463]" />
-          Cabinet21 · Kitchen &amp; Cabinet Design Studio
-        </motion.span>
+          <span className="h-1.5 w-1.5 rounded-full bg-[#e0bd85]" />
+          <span className="text-xs font-medium tracking-[0.25em] text-beige/90 uppercase">
+            {t.hero.eyebrow}
+          </span>
+        </motion.div>
 
-        <h1
-          ref={headlineRef}
-          className="font-display text-5xl leading-[1.05] text-bone sm:text-6xl md:text-7xl lg:text-8xl"
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className={`serif-heading mb-6 text-4xl leading-[1.25] font-semibold text-beige-light sm:text-5xl md:text-6xl lg:text-7xl ${
+            lang === "fa" ? "leading-[1.5]" : ""
+          }`}
         >
-          <span className="word inline-block">Designing</span>{" "}
-          <span className="word inline-block text-gradient-gold">Timeless</span>{" "}
-          <span className="word inline-block">Kitchens.</span>
-        </h1>
+          {t.hero.title.split(" ").map((word, i) => (
+            <span key={i} className="inline-block">
+              <motion.span
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.5 + i * 0.08 }}
+                className="inline-block"
+              >
+                {word}
+                &nbsp;
+              </motion.span>
+            </span>
+          ))}
+        </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.9 }}
-          className="mt-8 max-w-2xl text-balance text-base font-light leading-relaxed text-white/70 sm:text-lg"
+          transition={{ duration: 0.9, delay: 0.9 }}
+          className="mb-10 max-w-2xl text-base leading-relaxed text-beige/80 sm:text-lg"
         >
-          Premium Kitchen &amp; Cabinet Designer specializing in modern, minimalist and luxury
-          interiors — crafted with cinematic 3D visualization by Mehdi Khajevandi.
+          {t.hero.subtitle}
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.35, duration: 0.9 }}
-          className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
+          transition={{ duration: 0.9, delay: 1.1 }}
+          className="flex flex-col items-center gap-4 sm:flex-row"
         >
-          <a
-            href="#portfolio"
-            onClick={(e) => {
-              e.preventDefault();
-              document.querySelector("#portfolio")?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="btn-shine rounded-full bg-bone px-8 py-4 text-sm font-medium uppercase tracking-widest text-ink transition-transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/30"
+          <button
+            onClick={() => document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" })}
+            className="group relative overflow-hidden rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-8 py-3.5 text-sm font-semibold tracking-wide text-[#0a0908] shadow-xl shadow-black/40 transition-transform hover:scale-105 cursor-pointer"
           >
-            View Portfolio
-          </a>
-          <a
-            href="#contact"
-            onClick={(e) => {
-              e.preventDefault();
-              document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="btn-shine rounded-full border border-[#cba463]/60 bg-white/5 px-8 py-4 text-sm font-medium uppercase tracking-widest text-[#e0c393] backdrop-blur transition-transform hover:-translate-y-0.5 hover:bg-[#cba463]/10"
+            {t.hero.ctaPrimary}
+          </button>
+          <button
+            onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+            className="rounded-full border border-white/25 bg-white/5 px-8 py-3.5 text-sm font-semibold tracking-wide text-beige-light backdrop-blur-md transition-colors hover:bg-white/10 cursor-pointer"
           >
-            Get Free Design Consultation
-          </a>
+            {t.hero.ctaSecondary}
+          </button>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* Scroll cue */}
+      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-white/50"
+        transition={{ delay: 1.6, duration: 1 }}
+        className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
       >
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-          <div className="h-10 w-px overflow-hidden bg-white/20">
-            <motion.div
-              className="h-4 w-px bg-[#cba463]"
-              animate={{ y: [0, 30, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
+        <span className="text-[10px] tracking-[0.3em] text-beige/50 uppercase">{t.hero.scroll}</span>
+        <div className="relative h-10 w-[1px] overflow-hidden bg-white/20">
+          <motion.div
+            animate={{ y: ["-100%", "100%"] }}
+            transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+            className="absolute h-full w-full bg-[#e0bd85]"
+          />
         </div>
       </motion.div>
     </section>
