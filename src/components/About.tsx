@@ -1,5 +1,35 @@
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import { useLanguage } from "../i18n/LanguageContext";
+
+function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const [display, setDisplay] = useState("0");
+
+  useEffect(() => {
+    if (!inView) return;
+    const numericPart = value.replace(/[^0-9]/g, "");
+    const target = parseInt(numericPart, 10);
+    if (isNaN(target)) { setDisplay(value); return; }
+
+    const prefix = value.match(/^[^0-9]*/)?.[0] ?? "";
+    const duration = 1500;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(eased * target);
+      setDisplay(`${prefix}${current}${suffix}`);
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [inView, value, suffix]);
+
+  return <span ref={ref}>{display}</span>;
+}
 
 export default function About() {
   const { t } = useLanguage();
@@ -24,11 +54,17 @@ export default function About() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </div>
-          <div className="glass-panel absolute -bottom-8 -end-6 max-w-[240px] rounded-2xl p-5 shadow-2xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="glass-panel absolute -bottom-8 -end-6 max-w-[240px] rounded-2xl p-5 shadow-2xl"
+          >
             <p className="serif-heading text-3xl font-semibold text-gradient-gold">9+</p>
             <p className="mt-1 text-xs leading-relaxed text-beige/70">{t.about.designer}</p>
             <p className="text-sm font-medium text-beige-light">{t.about.designerName}</p>
-          </div>
+          </motion.div>
         </motion.div>
 
         <motion.div
@@ -60,7 +96,7 @@ export default function About() {
                 className="border-s border-white/10 ps-4"
               >
                 <p className="serif-heading text-2xl font-semibold text-gradient-gold sm:text-3xl">
-                  {stat.value}
+                  <AnimatedCounter value={stat.value} />
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-beige/60">{stat.label}</p>
               </motion.div>

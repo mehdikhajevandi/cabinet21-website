@@ -15,7 +15,13 @@ export default function Services() {
 
   return (
     <section id="services" className="relative bg-graphite py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
+      {/* Decorative gradient */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -start-40 h-80 w-80 rounded-full bg-[#b8935a]/5 blur-[100px]" />
+        <div className="absolute -bottom-40 -end-40 h-80 w-80 rounded-full bg-[#b8935a]/5 blur-[100px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -47,12 +53,19 @@ export default function Services() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, delay: (i % 3) * 0.12 }}
                 whileHover={{ y: -8 }}
-                className={`group glass-panel relative overflow-hidden rounded-2xl p-8 transition-colors duration-500 hover:border-[#b8935a]/40 ${
+                className={`group glass-panel relative overflow-hidden rounded-2xl p-8 transition-all duration-500 hover:border-[#b8935a]/40 hover:shadow-xl hover:shadow-[#b8935a]/5 ${
                   i === 4 ? "sm:col-span-2 lg:col-span-1" : ""
                 }`}
               >
-                <div className="pointer-events-none absolute -end-10 -top-10 h-32 w-32 rounded-full bg-[#b8935a]/0 blur-2xl transition-colors duration-500 group-hover:bg-[#b8935a]/15" />
-                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl border border-[#b8935a]/30 bg-[#b8935a]/5 text-3xl text-[#e0bd85] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                {/* Glow effect on hover */}
+                <div className="pointer-events-none absolute -end-10 -top-10 h-32 w-32 rounded-full bg-[#b8935a]/0 blur-2xl transition-all duration-700 group-hover:bg-[#b8935a]/15 group-hover:scale-150" />
+
+                {/* Number badge */}
+                <span className="absolute top-6 end-6 text-[10px] font-bold tracking-wider text-white/10 transition-colors duration-500 group-hover:text-[#e0bd85]/30">
+                  0{i + 1}
+                </span>
+
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl border border-[#b8935a]/30 bg-[#b8935a]/5 text-3xl text-[#e0bd85] transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:border-[#b8935a]/60 group-hover:shadow-lg group-hover:shadow-[#b8935a]/10">
                   <Icon />
                 </div>
                 <h3 className="serif-heading mb-3 text-xl font-semibold text-beige-light">

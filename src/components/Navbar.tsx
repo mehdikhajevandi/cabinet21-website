@@ -9,10 +9,24 @@ export default function Navbar() {
   const { t, dir } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("home");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+
+      // Detect active section
+      let current = "home";
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 120) current = id;
+        }
+      }
+      setActive(current);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -27,8 +41,8 @@ export default function Navbar() {
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-        scrolled ? "glass-panel border-b border-white/10 py-3" : "bg-transparent py-6"
+      className={`rounded-full fixed top-1 z-50 left-2 right-1 transition-all duration-500 ${
+        scrolled ? "glass-panel border-white/10 py-3" : "bg-transparent py-6"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
@@ -50,9 +64,18 @@ export default function Navbar() {
             <button
               key={s}
               onClick={() => scrollTo(s)}
-              className="text-sm font-medium tracking-wide text-beige/80 transition-colors hover:text-[#e0bd85] cursor-pointer"
+              className={`relative text-sm font-medium tracking-wide transition-colors cursor-pointer ${
+                active === s ? "text-[#e0bd85]" : "text-beige/80 hover:text-[#e0bd85]"
+              }`}
             >
               {t.nav[s]}
+              {active === s && (
+                <motion.span
+                  layoutId="nav-indicator"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  className="absolute -bottom-1.5 left-0 right-0 h-[1.5px] bg-gradient-to-r from-[#e0bd85] to-[#b8935a]"
+                />
+              )}
             </button>
           ))}
         </nav>
@@ -74,8 +97,9 @@ export default function Navbar() {
             className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full border border-white/15 cursor-pointer"
             aria-label="menu"
           >
-            <span className={`h-[1.5px] w-5 bg-beige-light transition-transform ${open ? "translate-y-[3px] rotate-45" : ""}`} />
-            <span className={`h-[1.5px] w-5 bg-beige-light transition-transform ${open ? "-translate-y-[3px] -rotate-45" : ""}`} />
+            <span className={`h-[1.5px] w-5 bg-beige-light transition-all duration-300 ${open ? "translate-y-[3px] rotate-45" : ""}`} />
+            <span className={`h-[1.5px] w-5 bg-beige-light transition-all duration-300 ${open ? "opacity-0" : "opacity-100"}`} />
+            <span className={`h-[1.5px] w-5 bg-beige-light transition-all duration-300 ${open ? "-translate-y-[3px] -rotate-45" : ""}`} />
           </button>
         </div>
       </div>
@@ -86,18 +110,25 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden lg:hidden"
           >
             <div className="glass-panel mx-4 mt-4 flex flex-col gap-1 rounded-2xl p-4" dir={dir}>
-              {sections.map((s) => (
-                <button
+              {sections.map((s, i) => (
+                <motion.button
                   key={s}
+                  initial={{ opacity: 0, x: dir === "rtl" ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.3 }}
                   onClick={() => scrollTo(s)}
-                  className="rounded-lg px-4 py-3 text-start text-sm font-medium text-beige/90 transition-colors hover:bg-white/5 cursor-pointer"
+                  className={`rounded-lg px-4 py-3 text-start text-sm font-medium transition-colors cursor-pointer ${
+                    active === s
+                      ? "bg-[#b8935a]/10 text-[#e0bd85]"
+                      : "text-beige/90 hover:bg-white/5"
+                  }`}
                 >
                   {t.nav[s]}
-                </button>
+                </motion.button>
               ))}
             </div>
           </motion.div>

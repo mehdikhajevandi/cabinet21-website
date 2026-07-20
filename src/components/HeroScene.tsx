@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Float, Environment, MeshTransmissionMaterial } from "@react-three/drei";
+import { Float, Environment } from "@react-three/drei";
 import * as THREE from "three";
 
 function GoldRing({ position, scale = 1, speed = 1 }: { position: [number, number, number]; scale?: number; speed?: number }) {
@@ -14,14 +14,14 @@ function GoldRing({ position, scale = 1, speed = 1 }: { position: [number, numbe
   return (
     <Float speed={1.2 * speed} rotationIntensity={0.4} floatIntensity={1.1}>
       <mesh ref={ref} position={position} scale={scale}>
-        <torusGeometry args={[1, 0.03, 32, 128]} />
+        <torusGeometry args={[1, 0.03, 16, 64]} />
         <meshStandardMaterial color="#b8935a" metalness={0.9} roughness={0.2} emissive="#3a2a15" emissiveIntensity={0.2} />
       </mesh>
     </Float>
   );
 }
 
-function MarbleSlab() {
+function GlassPanel() {
   const ref = useRef<THREE.Mesh>(null);
   const { viewport } = useThree();
 
@@ -40,14 +40,14 @@ function MarbleSlab() {
     <group scale={scale}>
       <mesh ref={ref} position={[0, 0, 0]}>
         <boxGeometry args={[2.6, 1.6, 0.12]} />
-        <MeshTransmissionMaterial
+        <meshPhysicalMaterial
+          transmission={0.9}
           thickness={0.4}
           roughness={0.15}
-          transmission={0.95}
           ior={1.3}
-          chromaticAberration={0.02}
           color="#e8dcc4"
-          backside
+          transparent
+          opacity={0.7}
         />
       </mesh>
       <lineSegments position={[0, 0, 0.07]}>
@@ -58,7 +58,7 @@ function MarbleSlab() {
   );
 }
 
-function Particles({ count = 60 }: { count?: number }) {
+function Particles({ count = 30 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
@@ -111,13 +111,13 @@ export default function HeroScene() {
       <Canvas
         dpr={[1, 1.5]}
         camera={{ position: [0, 0, 5], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[3, 3, 3]} intensity={1.4} color="#e0bd85" />
         <directionalLight position={[-3, -2, -2]} intensity={0.4} color="#8a6141" />
         <Environment preset="apartment" />
-        <MarbleSlab />
+        <GlassPanel />
         <GoldRing position={[-1.8, 0.8, -0.5]} scale={0.5} speed={0.8} />
         <GoldRing position={[2, -0.7, -0.8]} scale={0.35} speed={1.3} />
         <Particles />

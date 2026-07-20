@@ -1,7 +1,44 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../i18n/LanguageContext";
 import portfolioData from "../data/portfolio.json";
+
+function TiltCard({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const onMove = (e: React.MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) scale(1.02)`;
+  };
+
+  const onLeave = () => {
+    if (ref.current) {
+      ref.current.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg) scale(1)";
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      className={className}
+      style={{ transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function Portfolio() {
   const { t, lang } = useLanguage();
@@ -43,56 +80,60 @@ export default function Portfolio() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.8, delay: (i % 2) * 0.15 }}
-              onMouseEnter={() => setActive(i)}
-              onMouseLeave={() => setActive(null)}
-              className="group relative aspect-[4/5] cursor-pointer overflow-hidden rounded-2xl sm:aspect-[16/11]"
-              style={{ perspective: 1000 }}
             >
-              <motion.img
-                src={item.image}
-                alt={`${item.title} - ${item.category}`}
-                loading="lazy"
-                animate={{ scale: active === i ? 1.08 : 1 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 transition-opacity duration-500" />
-              <div className="absolute inset-0 border border-white/10 transition-colors duration-500 group-hover:border-[#e0bd85]/50" />
-
-              <div className="absolute top-5 flex w-full justify-between px-5 start-0">
-                <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[10px] font-medium tracking-wider text-beige-light uppercase backdrop-blur-md">
-                  {lang === "fa" ? item.categoryFa : item.category}
-                </span>
-              </div>
-
-              <motion.div
-                initial={false}
-                animate={{ y: active === i ? 0 : 12, opacity: active === i ? 1 : 0.9 }}
-                transition={{ duration: 0.4 }}
-                className="absolute bottom-0 w-full p-6 sm:p-7"
-              >
-                <h3 className="serif-heading mb-2 text-2xl font-semibold text-beige-light sm:text-3xl">
-                  {item.title}
-                </h3>
-                <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-beige/70">
-                  <span>
-                    {t.portfolio.material}: <span className="text-[#e0bd85]">{item.material}</span>
-                  </span>
-                </div>
-                <motion.div
-                  initial={false}
-                  animate={{ height: active === i ? "auto" : 0, opacity: active === i ? 1 : 0 }}
-                  className="overflow-hidden"
+              <TiltCard className="group relative aspect-[4/5] cursor-pointer overflow-hidden rounded-2xl sm:aspect-[16/11]">
+                <div
+                  onMouseEnter={() => setActive(i)}
+                  onMouseLeave={() => setActive(null)}
+                  className="relative h-full w-full"
                 >
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProject(item)}
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0bd85]/50 bg-[#e0bd85]/10 px-5 py-2 text-xs font-semibold tracking-wide text-[#e0bd85] backdrop-blur-md transition-colors hover:bg-[#e0bd85]/20"
+                  <motion.img
+                    src={item.image}
+                    alt={`${item.title} - ${item.category}`}
+                    loading="lazy"
+                    animate={{ scale: active === i ? 1.08 : 1 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 transition-opacity duration-500" />
+                  <div className="absolute inset-0 border border-white/10 transition-colors duration-500 group-hover:border-[#e0bd85]/50" />
+
+                  <div className="absolute top-5 flex w-full justify-between px-5 start-0">
+                    <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[10px] font-medium tracking-wider text-beige-light uppercase backdrop-blur-md">
+                      {lang === "fa" ? item.categoryFa : item.category}
+                    </span>
+                  </div>
+
+                  <motion.div
+                    initial={false}
+                    animate={{ y: active === i ? 0 : 12, opacity: active === i ? 1 : 0.9 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute bottom-0 w-full p-6 sm:p-7"
                   >
-                    {t.portfolio.viewProject}
-                  </button>
-                </motion.div>
-              </motion.div>
+                    <h3 className="serif-heading mb-2 text-2xl font-semibold text-beige-light sm:text-3xl">
+                      {item.title}
+                    </h3>
+                    <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-beige/70">
+                      <span>
+                        {t.portfolio.material}: <span className="text-[#e0bd85]">{item.material}</span>
+                      </span>
+                    </div>
+                    <motion.div
+                      initial={false}
+                      animate={{ height: active === i ? "auto" : 0, opacity: active === i ? 1 : 0 }}
+                      className="overflow-hidden"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedProject(item)}
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#e0bd85]/50 bg-[#e0bd85]/10 px-5 py-2 text-xs font-semibold tracking-wide text-[#e0bd85] backdrop-blur-md transition-colors hover:bg-[#e0bd85]/20"
+                      >
+                        {t.portfolio.viewProject}
+                      </button>
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </TiltCard>
             </motion.div>
           ))}
         </div>

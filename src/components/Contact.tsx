@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { PiPhoneCallDuotone, PiInstagramLogoDuotone, PiPaperPlaneTiltDuotone } from "react-icons/pi";
 import { useLanguage } from "../i18n/LanguageContext";
 
@@ -64,10 +64,12 @@ export default function Contact() {
             <div className="flex flex-col gap-4">
               <a
                 href={`tel:${PHONE_INTL}`}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:border-[#b8935a]/40 hover:bg-white/10"
+                className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-all duration-300 hover:border-[#b8935a]/40 hover:bg-white/10 hover:shadow-lg hover:shadow-[#b8935a]/5"
               >
                 <div className="flex items-center gap-3">
-                  <PiPhoneCallDuotone className="text-xl text-[#e0bd85]" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#b8935a]/10 text-[#e0bd85] transition-transform duration-300 group-hover:scale-110">
+                    <PiPhoneCallDuotone className="text-xl" />
+                  </div>
                   <div>
                     <p className="text-[11px] tracking-wide text-beige/50 uppercase">{t.contact.phoneLabel}</p>
                     <p className="font-medium text-beige-light" dir="ltr">{PHONE}</p>
@@ -78,10 +80,12 @@ export default function Contact() {
                 href={INSTAGRAM}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-colors hover:border-[#b8935a]/40 hover:bg-white/10"
+                className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-5 py-4 transition-all duration-300 hover:border-[#b8935a]/40 hover:bg-white/10 hover:shadow-lg hover:shadow-[#b8935a]/5"
               >
                 <div className="flex items-center gap-3">
-                  <PiInstagramLogoDuotone className="text-xl text-[#e0bd85]" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#b8935a]/10 text-[#e0bd85] transition-transform duration-300 group-hover:scale-110">
+                    <PiInstagramLogoDuotone className="text-xl" />
+                  </div>
                   <div>
                     <p className="text-[11px] tracking-wide text-beige/50 uppercase">{t.contact.instaLabel}</p>
                     <p className="font-medium text-beige-light" dir="ltr">@cabinet.21</p>
@@ -123,27 +127,49 @@ export default function Contact() {
               required
               type="text"
               placeholder={t.contact.namePh}
-              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-colors focus:border-[#b8935a]/60"
+              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
             />
             <input
               required
               type="tel"
               placeholder={t.contact.phonePh}
               dir="ltr"
-              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-colors focus:border-[#b8935a]/60"
+              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
             />
             <textarea
               required
               rows={4}
               placeholder={t.contact.messagePh}
-              className="resize-none rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-colors focus:border-[#b8935a]/60"
+              className="resize-none rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
             />
             <button
               type="submit"
-              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-6 py-3.5 text-sm font-semibold text-[#0a0908] transition-transform hover:scale-[1.02] cursor-pointer"
+              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-6 py-3.5 text-sm font-semibold text-[#0a0908] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#b8935a]/20 cursor-pointer"
             >
-              <PiPaperPlaneTiltDuotone className="text-lg" />
-              {sent ? "✓" : t.contact.send}
+              <AnimatePresence mode="wait">
+                {sent ? (
+                  <motion.span
+                    key="check"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    exit={{ scale: 0 }}
+                    className="text-lg"
+                  >
+                    ✓
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="send"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="flex items-center gap-2"
+                  >
+                    <PiPaperPlaneTiltDuotone className="text-lg" />
+                    {t.contact.send}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </motion.form>
         </div>

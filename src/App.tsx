@@ -10,6 +10,7 @@ import Process from "./components/Process";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import FloatingActions from "./components/FloatingActions";
+import ScrollProgress from "./components/ScrollProgress";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Preloader />
       <div className="grain-overlay" />
       <CursorGlow />
+      <ScrollProgress />
       <div className="relative min-h-screen bg-noir text-beige-light">
         <Navbar />
         <main>

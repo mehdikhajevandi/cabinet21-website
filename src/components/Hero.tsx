@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "../i18n/LanguageContext";
-import HeroScene from "./HeroScene";
+
+const HeroScene = lazy(() => import("./HeroScene"));
 
 export default function Hero() {
   const { t, lang } = useLanguage();
@@ -59,7 +60,9 @@ export default function Hero() {
         style={{ transform: `translate(${mouse.x * 8}px, ${mouse.y * 6}px)` }}
         className="pointer-events-none absolute inset-0 z-[2] hidden opacity-70 transition-transform duration-300 ease-out md:block"
       >
-        <HeroScene />
+        <Suspense fallback={null}>
+          <HeroScene />
+        </Suspense>
       </div>
 
       {/* Content */}

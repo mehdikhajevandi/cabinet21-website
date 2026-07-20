@@ -1,6 +1,81 @@
 export type Lang = "fa" | "en";
 
-export const translations: Record<Lang, any> = {
+export interface Translations {
+  dir: "rtl" | "ltr";
+  nav: {
+    home: string;
+    about: string;
+    services: string;
+    portfolio: string;
+    process: string;
+    contact: string;
+    cta: string;
+  };
+  hero: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+    scroll: string;
+  };
+  about: {
+    eyebrow: string;
+    title: string;
+    text: string;
+    designer: string;
+    designerName: string;
+    stats: { value: string; label: string }[];
+  };
+  services: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    items: { title: string; desc: string }[];
+  };
+  portfolio: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    viewProject: string;
+    material: string;
+    style: string;
+    items: {
+      category: string;
+      categoryFa: string;
+      title: string;
+      material: string;
+      image: string;
+    }[];
+  };
+  process: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    steps: { title: string; desc: string }[];
+  };
+  contact: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    phoneLabel: string;
+    instaLabel: string;
+    callNow: string;
+    instagram: string;
+    consultation: string;
+    formTitle: string;
+    namePh: string;
+    phonePh: string;
+    messagePh: string;
+    send: string;
+  };
+  footer: {
+    rights: string;
+    designer: string;
+  };
+}
+
+export const translations: Record<Lang, Translations> = {
   fa: {
     dir: "rtl" as const,
     nav: {
@@ -260,78 +335,3 @@ export const translations: Record<Lang, any> = {
     },
   },
 } as const;
-
-export interface Translations {
-  dir: "rtl" | "ltr";
-  nav: {
-    home: string;
-    about: string;
-    services: string;
-    portfolio: string;
-    process: string;
-    contact: string;
-    cta: string;
-  };
-  hero: {
-    eyebrow: string;
-    title: string;
-    subtitle: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
-    scroll: string;
-  };
-  about: {
-    eyebrow: string;
-    title: string;
-    text: string;
-    designer: string;
-    designerName: string;
-    stats: { value: string; label: string }[];
-  };
-  services: {
-    eyebrow: string;
-    title: string;
-    subtitle: string;
-    items: { title: string; desc: string }[];
-  };
-  portfolio: {
-    eyebrow: string;
-    title: string;
-    subtitle: string;
-    viewProject: string;
-    material: string;
-    style: string;
-    items: {
-      category: string;
-      categoryFa: string;
-      title: string;
-      material: string;
-      image: string;
-    }[];
-  };
-  process: {
-    eyebrow: string;
-    title: string;
-    subtitle: string;
-    steps: { title: string; desc: string }[];
-  };
-  contact: {
-    eyebrow: string;
-    title: string;
-    subtitle: string;
-    phoneLabel: string;
-    instaLabel: string;
-    callNow: string;
-    instagram: string;
-    consultation: string;
-    formTitle: string;
-    namePh: string;
-    phonePh: string;
-    messagePh: string;
-    send: string;
-  };
-  footer: {
-    rights: string;
-    designer: string;
-  };
-}
