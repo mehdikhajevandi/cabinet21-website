@@ -1,20 +1,47 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PiPhoneCallDuotone, PiInstagramLogoDuotone, PiPaperPlaneTiltDuotone } from "react-icons/pi";
+import { PiPhoneCallDuotone, PiInstagramLogoDuotone, PiPaperPlaneTiltDuotone, PiSpinnerGapDuotone, PiWarningCircleDuotone, PiCheckCircleDuotone } from "react-icons/pi";
 import { useLanguage } from "../i18n/LanguageContext";
+import { submitMessage } from "../lib/api";
 
 const PHONE = "09115763911";
 const PHONE_INTL = "+989115763911";
 const INSTAGRAM = "https://instagram.com/cabinet.21";
 
+type FormStatus = "idle" | "sending" | "sent" | "error";
+
 export default function Contact() {
   const { t, lang } = useLanguage();
   const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<FormStatus>("idle");
+  const [form, setForm] = useState({ name: "", phone: "", message: "", website: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 4000);
+    if (status === "sending") return;
+
+    setStatus("sending");
+    try {
+      await submitMessage({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        message: form.message.trim(),
+        lang,
+        website: form.website, // honeypot — must stay empty for real visitors
+      });
+      setStatus("sent");
+      setSent(true);
+      setForm({ name: "", phone: "", message: "", website: "" });
+      setTimeout(() => {
+        setSent(false);
+        setStatus("idle");
+      }, 6000);
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -118,7 +145,7 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8 }}
-            className="glass-panel flex flex-col gap-5 rounded-2xl p-8 lg:col-span-3"
+            className="glass-panel relative flex flex-col gap-5 rounded-2xl p-8 lg:col-span-3"
           >
             <h3 className="serif-heading mb-1 text-2xl font-semibold text-beige-light">
               {t.contact.formTitle}
@@ -126,12 +153,20 @@ export default function Contact() {
             <input
               required
               type="text"
+              name="name"
+              value={form.name}
+              onChange={update("name")}
+              maxLength={80}
               placeholder={t.contact.namePh}
               className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
             />
             <input
               required
               type="tel"
+              name="phone"
+              value={form.phone}
+              onChange={update("phone")}
+              maxLength={40}
               placeholder={t.contact.phonePh}
               dir="ltr"
               className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
@@ -139,15 +174,45 @@ export default function Contact() {
             <textarea
               required
               rows={4}
+              name="message"
+              value={form.message}
+              onChange={update("message")}
+              maxLength={2000}
               placeholder={t.contact.messagePh}
               className="resize-none rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
             />
+
+            {/* Honeypot field — invisible to humans, catches most spam bots */}
+            <input
+              type="text"
+              name="website"
+              value={form.website}
+              onChange={update("website")}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute h-0 w-0 opacity-0"
+              style={{ pointerEvents: "none" }}
+            />
+
             <button
               type="submit"
-              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-6 py-3.5 text-sm font-semibold text-[#0a0908] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#b8935a]/20 cursor-pointer"
+              disabled={status === "sending"}
+              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-6 py-3.5 text-sm font-semibold text-[#0a0908] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#b8935a]/20 disabled:cursor-wait disabled:opacity-70 disabled:hover:scale-100 cursor-pointer"
             >
               <AnimatePresence mode="wait">
-                {sent ? (
+                {status === "sending" ? (
+                  <motion.span
+                    key="sending"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <PiSpinnerGapDuotone className="animate-spin text-lg" />
+                    {t.contact.sending}
+                  </motion.span>
+                ) : sent ? (
                   <motion.span
                     key="check"
                     initial={{ scale: 0, rotate: -180 }}
@@ -171,6 +236,31 @@ export default function Contact() {
                 )}
               </AnimatePresence>
             </button>
+
+            <AnimatePresence>
+              {status === "sent" && (
+                <motion.p
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  className="flex items-center gap-2 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-200"
+                >
+                  <PiCheckCircleDuotone className="shrink-0 text-base" />
+                  {t.contact.sentNote}
+                </motion.p>
+              )}
+              {status === "error" && (
+                <motion.p
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  className="flex items-center gap-2 rounded-xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-xs text-red-200"
+                >
+                  <PiWarningCircleDuotone className="shrink-0 text-base" />
+                  {t.contact.errorNote}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </motion.form>
         </div>
       </div>

@@ -1,1 +1,9 @@
 node_modules
+
+# Local environment (passwords, API address)
+.env
+.env.production
+.env.local
+
+# Visitor messages & admin sessions — private data, never commit
+server/data/*.json

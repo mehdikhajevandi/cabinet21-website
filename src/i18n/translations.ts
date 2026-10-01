@@ -68,6 +68,9 @@ export interface Translations {
     phonePh: string;
     messagePh: string;
     send: string;
+    sending: string;
+    sentNote: string;
+    errorNote: string;
   };
   footer: {
     rights: string;
@@ -199,6 +202,9 @@ export const translations: Record<Lang, Translations> = {
       phonePh: "شماره تماس",
       messagePh: "توضیحات پروژه شما",
       send: "ارسال درخواست",
+      sending: "در حال ارسال…",
+      sentNote: "درخواست شما ثبت شد. به‌زودی با شما تماس می‌گیریم.",
+      errorNote: "ارسال پیام ناموفق بود. لطفاً دوباره تلاش کنید یا با ما تماس بگیرید.",
     },
     footer: {
       rights: "تمامی حقوق برای استودیو کابینت ۲۱ محفوظ است.",
@@ -328,6 +334,9 @@ export const translations: Record<Lang, Translations> = {
       phonePh: "Phone Number",
       messagePh: "Tell us about your project",
       send: "Send Request",
+      sending: "Sending…",
+      sentNote: "Your request has been received. We will contact you soon.",
+      errorNote: "We couldn't send your message. Please try again or call us directly.",
     },
     footer: {
       rights: "All rights reserved to Cabinet21 Studio.",
