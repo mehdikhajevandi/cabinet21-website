@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PiPhoneCallDuotone, PiInstagramLogoDuotone, PiPaperPlaneTiltDuotone, PiSpinnerGapDuotone, PiWarningCircleDuotone, PiCheckCircleDuotone } from "react-icons/pi";
 import { useLanguage } from "../i18n/LanguageContext";
-import { submitMessage } from "../lib/api";
+// The access key lives in src/lib/web3forms.ts, the sending logic in src/lib/api.ts.
+import { sendConsultationRequest } from "../lib/api";
 
 const PHONE = "09115763911";
 const PHONE_INTL = "+989115763911";
@@ -10,32 +11,41 @@ const INSTAGRAM = "https://instagram.com/cabinet.21";
 
 type FormStatus = "idle" | "sending" | "sent" | "error";
 
+const field =
+  "rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5";
+
 export default function Contact() {
   const { t, lang } = useLanguage();
   const [sent, setSent] = useState(false);
   const [status, setStatus] = useState<FormStatus>("idle");
-  const [form, setForm] = useState({ name: "", phone: "", message: "", website: "" });
+  const resetTimer = useRef<number | undefined>(undefined);
 
-  const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm((prev) => ({ ...prev, [key]: e.target.value }));
+  useEffect(() => () => window.clearTimeout(resetTimer.current), []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === "sending") return;
 
+    const formEl = e.currentTarget;
+    const formData = new FormData(formEl);
+
     setStatus("sending");
     try {
-      await submitMessage({
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        message: form.message.trim(),
+      await sendConsultationRequest({
+        name: String(formData.get("name") || "").trim(),
+        phone: String(formData.get("phone") || "").trim(),
+        message: String(formData.get("message") || "").trim(),
         lang,
-        website: form.website, // honeypot — must stay empty for real visitors
+        // Honeypots — both must stay empty for real visitors:
+        website: String(formData.get("website") || ""),
+        botcheck: String(formData.get("botcheck") || ""),
       });
+
       setStatus("sent");
       setSent(true);
-      setForm({ name: "", phone: "", message: "", website: "" });
-      setTimeout(() => {
+      formEl.reset();
+      window.clearTimeout(resetTimer.current);
+      resetTimer.current = window.setTimeout(() => {
         setSent(false);
         setStatus("idle");
       }, 6000);
@@ -154,45 +164,48 @@ export default function Contact() {
               required
               type="text"
               name="name"
-              value={form.name}
-              onChange={update("name")}
               maxLength={80}
+              autoComplete="name"
               placeholder={t.contact.namePh}
-              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
+              className={field}
             />
             <input
               required
               type="tel"
               name="phone"
-              value={form.phone}
-              onChange={update("phone")}
               maxLength={40}
+              autoComplete="tel"
               placeholder={t.contact.phonePh}
               dir="ltr"
-              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
+              className={field}
             />
             <textarea
               required
               rows={4}
               name="message"
-              value={form.message}
-              onChange={update("message")}
               maxLength={2000}
               placeholder={t.contact.messagePh}
-              className="resize-none rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
+              className={`resize-none ${field}`}
             />
 
-            {/* Honeypot field — invisible to humans, catches most spam bots */}
+            {/* Honeypot fields — invisible to humans, catches most spam bots */}
             <input
               type="text"
               name="website"
-              value={form.website}
-              onChange={update("website")}
               tabIndex={-1}
               autoComplete="off"
               aria-hidden="true"
               className="absolute h-0 w-0 opacity-0"
               style={{ pointerEvents: "none" }}
+            />
+            <input
+              type="checkbox"
+              name="botcheck"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="hidden"
+              style={{ display: "none" }}
             />
 
             <button
