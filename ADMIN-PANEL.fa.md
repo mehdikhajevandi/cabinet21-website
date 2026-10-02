@@ -33,6 +33,23 @@
 
 > نتیجه: حتی اگر هیچ‌کدام از مراحل بعدی را انجام ندهید، پیام‌های مشتریان به ایمیل شما می‌رسد.
 
+### اگر ایمیل نیامد، در ۳۰ ثانیه علتش را پیدا کنید
+
+۱. **Spam / Promotions:** پوشه Spam و زبانه‌های Promotions و Updates جیمیل را ببینید (ایمیل‌ها از `notify@web3forms.com` می‌آیند). اگر آنجا بود، «Report not spam» بزنید و فرستنده را به مخاطبین اضافه کنید.
+۲. **تب Console مرورگر:** کلید F12 → تب Console. اگر خط قرمزی دیدید که با `[Cabinet21 form]` شروع می‌شود، **متن دقیق خطای Web3Forms** همان‌جا نوشته شده است:
+   - `invalid access_key` → کلید اشتباه/غیرفعال است.
+   - `This form is restricted to certain domains` → قفل دامنه در پنل Web3Forms روشن است.
+   - `rate limit exceeded` / `quota` → سهمیه پلن رایگان (۲۵۰ ارسال در ماه) تمام شده.
+   - `Failed to fetch` → اتصال به `api.web3forms.com` برقرار نشده (اینترنت/فیلترشکن/مسدودسازی).
+   تب Network را هم ببینید: درخواست `submit` باید Status = `200` و در Response مقدار `"success": true` داشته باشد.
+۳. **تست کلید بدون مرورگر** (ویندوز → PowerShell):
+   ```powershell
+   curl.exe -s -X POST https://api.web3forms.com/submit -F "access_key=Da616331-2884-4c77-a1c2-2e455ca8af64" -F "subject=تست فرم" -F "name=تست" -F "phone=0911" -F "message=تست اتصال"
+   ```
+   - اگر `{"success":true,...}` آمد: کلید و سرویس سالم‌اند و مشکل فقط در مرورگر/هاست/بیلد سایت شماست.
+   - اگر پیام خطا آمد: کلید را در پنل [web3forms.com](https://web3forms.com) بررسی کنید یا همان متن خطا را برای `support@web3forms.com` بفرستید.
+۴. **اگر باز هم ایمیل نیامد** و همه‌چیز `success:true` بود، احتمالاً آدرس شما در «لیست سرکوب/برگشتی» (suppression list) سرویس افتاده است؛ با ایمیل `support@web3forms.com` مکاتبه کنید تا از لیست خارج شود.
+
 ---
 
 ## ۱) اجرای سریع روی کامپیوتر خودتان

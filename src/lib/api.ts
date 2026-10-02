@@ -114,6 +114,18 @@ export type ConsultationResult = {
   ignored: boolean;
 };
 
+/**
+ * Access keys are UUIDs and a stray capital letter makes the lookup fail,
+ * so the exact value is tried first and a lower-cased copy second.
+ * (`VITE_WEB3FORMS_ACCESS_KEY` in `.env` always wins over the built-in key.)
+ */
+function accessKeyCandidates(): string[] {
+  const keys = [WEB3FORMS_ACCESS_KEY];
+  const lower = WEB3FORMS_ACCESS_KEY.toLowerCase();
+  if (!keys.includes(lower)) keys.push(lower);
+  return keys;
+}
+
 /** Raised when the message could neither be e-mailed nor stored. */
 export class ConsultationError extends Error {
   code: string;
@@ -169,27 +181,57 @@ export async function sendConsultationRequest(payload: ConsultationPayload): Pro
     return { emailed: false, stored: false, ignored: true };
   }
 
-  const formData = new FormData();
-  formData.append("access_key", WEB3FORMS_ACCESS_KEY);
-  formData.append("subject", WEB3FORMS_SUBJECT[payload.lang === "en" ? "en" : "fa"]);
-  formData.append("from_name", "وب‌سایت کابینت ۲۱ — فرم مشاوره");
-  formData.append("name", payload.name);
-  formData.append("phone", payload.phone);
-  formData.append("message", payload.message);
-  formData.append("language", payload.lang === "en" ? "English" : "فارسی");
-
   let emailed = false;
-  try {
-    const response = await fetch(WEB3FORMS_ENDPOINT, {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: formData,
-    });
-    const data = (await response.json()) as { success?: boolean; message?: string };
-    emailed = response.ok && data?.success === true;
-    if (!emailed) console.warn("[contact] Web3Forms rejected the request:", data?.message || response.status);
-  } catch (error) {
-    console.warn("[contact] Web3Forms is unreachable:", error);
+  let lastError = "";
+
+  for (const key of accessKeyCandidates()) {
+    const formData = new FormData();
+    formData.append("access_key", key);
+    formData.append("subject", WEB3FORMS_SUBJECT[payload.lang === "en" ? "en" : "fa"]);
+    formData.append("from_name", "وب‌سایت کابینت ۲۱ — فرم مشاوره");
+    formData.append("name", payload.name);
+    formData.append("phone", payload.phone);
+    formData.append("message", payload.message);
+    formData.append("language", payload.lang === "en" ? "English" : "فارسی");
+
+    try {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
+
+      // Read the body as text first: Web3Forms always explains a rejection,
+      // but the reply is not JSON when something goes wrong upstream.
+      const raw = await response.text();
+      let data: { success?: boolean; message?: string } = {};
+      try {
+        data = JSON.parse(raw) as typeof data;
+      } catch {
+        /* not JSON — keep the raw text for the log below */
+      }
+
+      if (response.ok && data.success === true) {
+        emailed = true;
+        break;
+      }
+
+      lastError = `HTTP ${response.status} — ${data.message || raw.slice(0, 300) || "no response body"}`;
+      console.error(
+        `[Cabinet21 form] Web3Forms rejected the request (key ending "…${key.slice(-6)}"): ${lastError}`,
+      );
+    } catch (error) {
+      lastError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      console.error(`[Cabinet21 form] Web3Forms is unreachable: ${lastError}`);
+    }
+  }
+
+  if (!emailed) {
+    console.error(
+      "[Cabinet21 form] The message was NOT e-mailed. Check: (1) the access key belongs to a confirmed " +
+        "Web3Forms account, (2) the address is not on Web3Forms' bounce/suppression list " +
+        "(support@web3forms.com), (3) the monthly quota of the free plan (250) is not used up.",
+    );
   }
 
   let stored = false;
@@ -202,7 +244,7 @@ export async function sendConsultationRequest(payload: ConsultationPayload): Pro
     }
   }
 
-  if (!emailed && !stored) throw new ConsultationError("send_failed");
+  if (!emailed && !stored) throw new ConsultationError("send_failed", lastError);
   return { emailed, stored, ignored: false };
 }
 
