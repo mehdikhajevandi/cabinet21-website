@@ -1,29 +1,38 @@
 /**
- * Web3Forms — sends the "free consultation" form straight to e-mail.
+ * Web3Forms — optional second e-mail channel.
  * ------------------------------------------------------------------
- * The form needs no server, no hosting panel and no bank card: the
- * browser posts the form data to https://api.web3forms.com/submit and
- * Web3Forms delivers it to the inbox that owns the access key.
+ * ⚠️ IMPORTANT: an access key is an *alias of one inbox* — whoever
+ * created the key receives every message sent with it
+ * (see https://docs.web3forms.com/getting-started/faq).
  *
- * The access key is a *public* identifier (it is shipped in the site
- * bundle, that is how Web3Forms works) and is tied to one inbox:
- *      mehdi.khajevandi.21@gmail.com
+ * The key `Da616331-2884-4c77-a1c2-2e455ca8af64` was not created with
+ * the studio address, so messages sent with it never reach
+ * mehdi.khajevandi.21@gmail.com — and customer names/phone numbers
+ * would end up in a stranger's mailbox. It is therefore NOT used.
  *
- * To point the form at another inbox later:
- *   1. Create a free key at https://web3forms.com (just enter the e-mail).
- *   2. Put it in the project's ".env" file as
- *          VITE_WEB3FORMS_ACCESS_KEY=your-new-key
- *      …or replace the fallback value below.
+ * To enable this channel with your OWN key:
+ *   1. https://web3forms.com → enter mehdi.khajevandi.21@gmail.com →
+ *      "Create Access Key" (free, no account needed) and confirm the
+ *      e-mail they send you.
+ *   2. Either paste it in the `.env` file
+ *          VITE_WEB3FORMS_ACCESS_KEY=your-key
+ *      or set FALLBACK_ACCESS_KEY below.
+ *
+ * Meanwhile the studio inbox is served by FormSubmit (see formsubmit.ts).
  */
 
-/** Public Web3Forms access key of the Cabinet21 inbox. */
-export const WEB3FORMS_ACCESS_KEY =
-  (import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "").trim() ||
-  "Da616331-2884-4c77-a1c2-2e455ca8af64";
+/** Optional: paste your own Web3Forms key here to enable this channel. */
+const FALLBACK_ACCESS_KEY = "";
+
+/** Access key of the studio inbox — empty means "channel disabled". */
+export const WEB3FORMS_ACCESS_KEY = (
+  (import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || "").trim() || FALLBACK_ACCESS_KEY
+).trim();
+
+export const WEB3FORMS_ENABLED = WEB3FORMS_ACCESS_KEY.length > 0;
 
 export const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 
-/** Subject of the e-mail, per language of the visitor. */
 export const WEB3FORMS_SUBJECT: Record<"fa" | "en", string> = {
   fa: "درخواست جدید مشاوره رایگان — کابینت ۲۱",
   en: "New free consultation request — Cabinet21",
