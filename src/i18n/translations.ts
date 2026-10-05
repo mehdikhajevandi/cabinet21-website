@@ -68,6 +68,49 @@ export interface Translations {
     phonePh: string;
     messagePh: string;
     send: string;
+    sending: string;
+    sendSuccess: string;
+    sendError: string;
+    errName: string;
+    errPhone: string;
+    errMessage: string;
+  };
+  errors: {
+    network_error: string;
+    server_error: string;
+    rate_limited: string;
+    access_denied: string;
+    missing_config: string;
+    not_found: string;
+    validation_failed: string;
+    generic: string;
+  };
+  admin: {
+    title: string;
+    backToSite: string;
+    refresh: string;
+    newCount: string;
+    totalCount: string;
+    loading: string;
+    loadError: string;
+    retry: string;
+    emptyTitle: string;
+    emptyText: string;
+    sentAt: string;
+    contactEmail: string;
+    contactPhone: string;
+    noContact: string;
+    viewFull: string;
+    collapse: string;
+    statusLabel: string;
+    delete: string;
+    deleteConfirm: string;
+    yes: string;
+    no: string;
+    statusUpdated: string;
+    messageDeleted: string;
+    actionFailed: string;
+    statuses: { new: string; read: string; answered: string };
   };
   footer: {
     rights: string;
@@ -199,6 +242,49 @@ export const translations: Record<Lang, Translations> = {
       phonePh: "شماره تماس",
       messagePh: "توضیحات پروژه شما",
       send: "ارسال درخواست",
+      sending: "در حال ارسال…",
+      sendSuccess: "پیام شما با موفقیت ارسال شد",
+      sendError: "ارسال پیام ناموفق بود. لطفاً دوباره تلاش کنید.",
+      errName: "نام و نام خانوادگی باید حداقل ۲ حرف باشد.",
+      errPhone: "شماره تماس معتبر وارد کنید (مثال: 09123456789).",
+      errMessage: "متن پیام باید حداقل ۵ حرف باشد.",
+    },
+    errors: {
+      network_error: "ارتباط با سرور برقرار نشد. اینترنت خود را بررسی کنید.",
+      server_error: "خطایی در سرور رخ داد. لطفاً کمی بعد دوباره تلاش کنید.",
+      rate_limited: "درخواست‌ها زیاد هستند؛ لطفاً کمی صبر کنید و دوباره تلاش کنید.",
+      access_denied: "دسترسی به JSONBin برقرار نشد. تنظیمات سرور را بررسی کنید.",
+      missing_config: "پیکربندی سرور ناقص است. متغیرهای JSONBIN را تنظیم کنید.",
+      not_found: "پیام مورد نظر پیدا نشد.",
+      validation_failed: "اطلاعات واردشده معتبر نیست.",
+      generic: "خطایی رخ داد. لطفاً دوباره تلاش کنید.",
+    },
+    admin: {
+      title: "مدیریت پیام‌ها",
+      backToSite: "بازگشت به سایت",
+      refresh: "بروزرسانی",
+      newCount: "{count} پیام جدید",
+      totalCount: "{count} پیام",
+      loading: "در حال دریافت پیام‌ها…",
+      loadError: "دریافت پیام‌ها با خطا مواجه شد",
+      retry: "تلاش مجدد",
+      emptyTitle: "هنوز پیامی وجود ندارد",
+      emptyText: "پیام‌های ارسالی از فرم تماس، اینجا نمایش داده می‌شوند.",
+      sentAt: "ارسال‌شده در",
+      contactEmail: "ایمیل",
+      contactPhone: "تلفن",
+      noContact: "بدون اطلاعات تماس",
+      viewFull: "مشاهده کامل متن",
+      collapse: "بستن",
+      statusLabel: "وضعیت",
+      delete: "حذف",
+      deleteConfirm: "حذف شود؟",
+      yes: "حذف",
+      no: "انصراف",
+      statusUpdated: "وضعیت پیام بروزرسانی شد",
+      messageDeleted: "پیام حذف شد",
+      actionFailed: "انجام عملیات ناموفق بود",
+      statuses: { new: "جدید", read: "خوانده‌شده", answered: "پاسخ‌داده‌شده" },
     },
     footer: {
       rights: "تمامی حقوق برای استودیو کابینت ۲۱ محفوظ است.",
@@ -328,6 +414,49 @@ export const translations: Record<Lang, Translations> = {
       phonePh: "Phone Number",
       messagePh: "Tell us about your project",
       send: "Send Request",
+      sending: "Sending…",
+      sendSuccess: "Your message was sent successfully",
+      sendError: "Could not send your message. Please try again.",
+      errName: "Name must be at least 2 characters.",
+      errPhone: "Enter a valid phone number (e.g. 09123456789).",
+      errMessage: "Message must be at least 5 characters.",
+    },
+    errors: {
+      network_error: "Could not reach the server. Check your connection.",
+      server_error: "Something went wrong on the server. Please try again shortly.",
+      rate_limited: "Too many requests. Please wait a moment and try again.",
+      access_denied: "Could not access JSONBin. Check the server configuration.",
+      missing_config: "Server configuration is incomplete. Set the JSONBIN variables.",
+      not_found: "The requested message was not found.",
+      validation_failed: "Some of the provided data is invalid.",
+      generic: "Something went wrong. Please try again.",
+    },
+    admin: {
+      title: "Message Inbox",
+      backToSite: "Back to website",
+      refresh: "Refresh",
+      newCount: "{count} new messages",
+      totalCount: "{count} messages",
+      loading: "Loading messages…",
+      loadError: "Could not load messages",
+      retry: "Retry",
+      emptyTitle: "No messages yet",
+      emptyText: "Messages sent through the contact form will appear here.",
+      sentAt: "Sent at",
+      contactEmail: "Email",
+      contactPhone: "Phone",
+      noContact: "No contact details",
+      viewFull: "View full message",
+      collapse: "Collapse",
+      statusLabel: "Status",
+      delete: "Delete",
+      deleteConfirm: "Delete?",
+      yes: "Delete",
+      no: "Cancel",
+      statusUpdated: "Message status updated",
+      messageDeleted: "Message deleted",
+      actionFailed: "The action could not be completed",
+      statuses: { new: "New", read: "Read", answered: "Answered" },
     },
     footer: {
       rights: "All rights reserved to Cabinet21 Studio.",

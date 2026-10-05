@@ -1,21 +1,105 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PiPhoneCallDuotone, PiInstagramLogoDuotone, PiPaperPlaneTiltDuotone } from "react-icons/pi";
+import {
+  PiCircleNotchDuotone,
+  PiPhoneCallDuotone,
+  PiInstagramLogoDuotone,
+  PiPaperPlaneTiltDuotone,
+} from "react-icons/pi";
 import { useLanguage } from "../i18n/LanguageContext";
+import { createMessage } from "../api/messages";
+import { apiErrorMessage } from "../api/errorMessage";
 
 const PHONE = "09115763911";
 const PHONE_INTL = "+989115763911";
 const INSTAGRAM = "https://instagram.com/cabinet.21";
 
+type SubmitStatus = "idle" | "submitting" | "success" | "error";
+
+interface FormValues {
+  name: string;
+  phone: string;
+  message: string;
+}
+
+type FormErrors = Partial<Record<keyof FormValues, string>>;
+
+const EMPTY_FORM: FormValues = { name: "", phone: "", message: "" };
+
+const PHONE_RE = /^(?:\+98|0098|98|0)?9\d{9}$/;
+
 export default function Contact() {
   const { t, lang } = useLanguage();
-  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState<FormValues>(EMPTY_FORM);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const successTimer = useRef<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 4000);
+  useEffect(() => {
+    return () => {
+      if (successTimer.current !== null) window.clearTimeout(successTimer.current);
+    };
+  }, []);
+
+  const validate = (values: FormValues): FormErrors => {
+    const next: FormErrors = {};
+
+    if (values.name.trim().length < 2) next.name = t.contact.errName;
+
+    const phone = values.phone.replace(/[\s\-().]/g, "");
+    if (!PHONE_RE.test(phone)) next.phone = t.contact.errPhone;
+
+    if (values.message.trim().length < 5) next.message = t.contact.errMessage;
+
+    return next;
   };
+
+  const updateField = (field: keyof FormValues, value: string) => {
+    setForm((previous) => ({ ...previous, [field]: value }));
+    if (errors[field]) setErrors((previous) => ({ ...previous, [field]: undefined }));
+    if (status === "error") {
+      setStatus("idle");
+      setSubmitError(null);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (status === "submitting") return; // no double submit
+
+    const nextErrors = validate(form);
+    setErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean)) return;
+
+    setStatus("submitting");
+    setSubmitError(null);
+
+    try {
+      await createMessage({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        message: form.message.trim(),
+      });
+
+      setForm(EMPTY_FORM);
+      setStatus("success");
+      if (successTimer.current !== null) window.clearTimeout(successTimer.current);
+      successTimer.current = window.setTimeout(() => {
+        setStatus((current) => (current === "success" ? "idle" : current));
+      }, 6000);
+    } catch (error) {
+      setSubmitError(apiErrorMessage(error, t, t.contact.sendError));
+      setStatus("error");
+    }
+  };
+
+  const isSubmitting = status === "submitting";
+  const inputClass = (invalid?: string) =>
+    [
+      "rounded-xl border bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5",
+      invalid ? "border-red-400/60" : "border-white/10",
+    ].join(" ");
 
   return (
     <section id="contact" className="relative overflow-hidden bg-noir py-24 sm:py-32">
@@ -114,6 +198,7 @@ export default function Contact() {
 
           <motion.form
             onSubmit={handleSubmit}
+            noValidate
             initial={{ opacity: 0, x: lang === "fa" ? -40 : 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.3 }}
@@ -123,31 +208,70 @@ export default function Contact() {
             <h3 className="serif-heading mb-1 text-2xl font-semibold text-beige-light">
               {t.contact.formTitle}
             </h3>
-            <input
-              required
-              type="text"
-              placeholder={t.contact.namePh}
-              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
-            />
-            <input
-              required
-              type="tel"
-              placeholder={t.contact.phonePh}
-              dir="ltr"
-              className="rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
-            />
-            <textarea
-              required
-              rows={4}
-              placeholder={t.contact.messagePh}
-              className="resize-none rounded-xl border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-beige-light placeholder:text-beige/40 outline-none transition-all duration-300 focus:border-[#b8935a]/60 focus:bg-white/[0.07] focus:shadow-lg focus:shadow-[#b8935a]/5"
-            />
+
+            <div className="flex flex-col gap-1.5">
+              <input
+                required
+                type="text"
+                name="name"
+                autoComplete="name"
+                value={form.name}
+                onChange={(event) => updateField("name", event.target.value)}
+                placeholder={t.contact.namePh}
+                aria-invalid={Boolean(errors.name)}
+                className={inputClass(errors.name)}
+              />
+              {errors.name && <p className="text-xs text-red-300">{errors.name}</p>}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <input
+                required
+                type="tel"
+                name="phone"
+                autoComplete="tel"
+                value={form.phone}
+                onChange={(event) => updateField("phone", event.target.value)}
+                placeholder={t.contact.phonePh}
+                dir="ltr"
+                aria-invalid={Boolean(errors.phone)}
+                className={inputClass(errors.phone)}
+              />
+              {errors.phone && <p className="text-xs text-red-300" dir="auto">{errors.phone}</p>}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <textarea
+                required
+                rows={4}
+                name="message"
+                value={form.message}
+                onChange={(event) => updateField("message", event.target.value)}
+                placeholder={t.contact.messagePh}
+                aria-invalid={Boolean(errors.message)}
+                className={`resize-none ${inputClass(errors.message)}`}
+              />
+              {errors.message && <p className="text-xs text-red-300">{errors.message}</p>}
+            </div>
+
             <button
               type="submit"
-              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-6 py-3.5 text-sm font-semibold text-[#0a0908] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#b8935a]/20 cursor-pointer"
+              disabled={isSubmitting}
+              className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e0bd85] to-[#b8935a] px-6 py-3.5 text-sm font-semibold text-[#0a0908] transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#b8935a]/20 disabled:cursor-wait disabled:scale-100 disabled:opacity-75"
             >
               <AnimatePresence mode="wait">
-                {sent ? (
+                {isSubmitting ? (
+                  <motion.span
+                    key="sending"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <PiCircleNotchDuotone className="animate-spin text-lg" />
+                    {t.contact.sending}
+                  </motion.span>
+                ) : status === "success" ? (
                   <motion.span
                     key="check"
                     initial={{ scale: 0, rotate: -180 }}
@@ -171,6 +295,35 @@ export default function Contact() {
                 )}
               </AnimatePresence>
             </button>
+
+            <div aria-live="polite">
+              <AnimatePresence>
+                {status === "success" && (
+                  <motion.p
+                    key="success"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    role="status"
+                    className="mt-1 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-center text-sm font-medium text-emerald-200"
+                  >
+                    {t.contact.sendSuccess}
+                  </motion.p>
+                )}
+                {status === "error" && submitError && (
+                  <motion.p
+                    key="error"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    role="alert"
+                    className="mt-1 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-center text-sm font-medium text-red-200"
+                  >
+                    {submitError}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.form>
         </div>
       </div>
